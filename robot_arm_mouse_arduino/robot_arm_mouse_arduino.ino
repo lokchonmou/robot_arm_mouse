@@ -11,7 +11,6 @@ void setup() {
 
 void loop() {
   if (Serial.available() > 0) {
-    digitalWrite(13, HIGH);
     values[currentValue] = Serial.read();
     currentValue++;
     if (currentValue > 5) {
@@ -19,7 +18,7 @@ void loop() {
       for (byte i = 0; i <= 5; i++) {
         if (values[i] < 250 )
         {
-          if (servo[i].attached() == LOW)  servo[i].attach(14 + i);
+          if (servo[i].attached() == LOW)  servo[i].attach(13 - i);
           servo[i].write(values[i]);
         }
         else {
