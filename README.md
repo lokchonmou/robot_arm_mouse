@@ -1,6 +1,6 @@
 # robot_arm_mouse
 control 4 DOF robot arm using mouse, thought Processing
-
+Also read <a src="https://sites.google.com/site/arduinorobotprocessing/home/arduino/2-arduino-x-robot/2-7-robot-arms">this</a> to learn the theory and the connection 
 <img width = 300px src="https://lh5.googleusercontent.com/-iVy9mOLFt-U/VWfRbBA9vFI/AAAAAAAAFsc/1umu8NvZ1Gg/w1582-h1224-no/dh%2Bgraph.jpg">
 
 the define servo angles are 90, using a servo tester, set the angle to 90, see if the robot align the dh graph above
