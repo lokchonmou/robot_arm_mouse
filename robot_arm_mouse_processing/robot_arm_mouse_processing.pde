@@ -244,7 +244,7 @@ void drawing() {
   fill(#000000);
   text(int(positionZ), width-55, height/2 - positionZ/2);
 
-  stroke(255, 0, 0);
+  stroke(#FF0000);
   line(width/2, 0, width/2, height);
   line(0, height-1, width, height-1);
   coordinates = "(" + rpositionX + "," + rpositionY + ")";
@@ -272,7 +272,12 @@ void drawing() {
   fill(#000000);
   text(s1, 10, 10);
   text(s2, 10, 50);
-
+  
+  fill(#939191);
+  textSize(12);
+  textAlign(RIGHT, BOTTOM);
+  text("using the mouse wheel to adjust Z /n Press 'a' and 's' to adjust theta_3", width, height);
+  
   if (!trigger_servo) {
     fill(#AAAAAA, 200);
     noStroke();
