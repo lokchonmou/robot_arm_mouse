@@ -32,7 +32,7 @@ void loop() {
               digitalWrite(M1, HIGH);
               analogWrite(E1, values[i] - 90);
             }
-            else if (values[i] > 0 && values[i] <= 90) {
+            else if (values[i] >= 0 && values[i] <= 90) {
               digitalWrite(M1, LOW);
               analogWrite(E1, 90 - values[i]);
             }
