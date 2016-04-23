@@ -25,20 +25,20 @@ byte out[] = new byte[6];
 
 //setup ( set length of arm )
 //--------------------------------------------
-float r1 = 160.0;
-float r2 = 270.0;
+float r1 = 148.0;
+float r2 = 160.0;
 // servo angle [min     center     max    direction]
 float[][]  setup_theta = {
   {
-    0, 80, 180, 0      //shoulder_yaw
+    0, 104, 180, 1      //shoulder_yaw
   }
   , 
   {
-    0, 95, 180, 1      //shoulder_pitch
+    40, 78, 160, 1      //shoulder_pitch
   }
   , 
   {
-    0, 100, 180, 0      //Elbow 手肘
+    23, 142, 146, 0      //Elbow 手肘
   }
   , 
   {
@@ -110,7 +110,7 @@ void draw() {
       //--------------------------------------------
       rtheta[0] = round(theta[0]);
       rtheta[1] = round(theta[1]);
-      rtheta[2] = round(theta[2]) + 90;
+      rtheta[2] = rtheta[1] + round(theta[2]);
       rtheta[3] = round(theta[3]);
       rtheta[4] = round(theta[4]);
 
@@ -175,7 +175,7 @@ void forward_kinematics() {
   if (positionY <= low_ylimit) positionY = low_ylimit;
 
   max_rad = sqrt(sq(r1) + sq(r2) - sq(positionZ) + 2 * r1 * r2 );
-  min_rad = sqrt(sq(r1) + sq(r2) -( sqrt(3) * r1 * r2 )- sq(positionZ));
+  min_rad = sqrt(sq(r1) + sq(r2) -( 2*cos(radians(10)) * r1 * r2 )- sq(positionZ));
   if (max_rad < 0) max_rad = 0;
 
   up_ylimit_2 = sqrt(sq(max_rad) - sq(positionX));
