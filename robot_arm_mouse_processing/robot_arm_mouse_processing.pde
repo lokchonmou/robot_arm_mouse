@@ -1,6 +1,6 @@
 import processing.serial.*;
 Serial myPort;  
-import java.awt.*; 
+import static javax.swing.JOptionPane.*;
 
 //Dim variables
 //--------------------------------------------
@@ -15,7 +15,7 @@ float up_zlimit, low_zlimit, low_ylimit, low_ylimit_2, up_ylimit_2, left_xlimit,
 int[] rtheta = new int[6];
 int rpositionX, rpositionY, rpositionZ;
 int clamp;
-Choice guiChoice = new Choice();
+//Choice guiChoice = new Choice();
 boolean firstContact = false;
 boolean first_run = false;
 boolean selected_port = false;
@@ -60,111 +60,143 @@ float[] theta = {
 
 void setup() 
 {
+  String COMx, COMlist = "";
+  try {
+    printArray(Serial.list());
+    int i = Serial.list().length;
+    if (i != 0) {
+      if (i >= 2) {
+        // need to check which port the inst uses -
+        // for now we'll just let the user decide
+        for (int j = 0; j < i; ) {
+          COMlist += char(j+'0' )+ " = " + Serial.list()[j];
+          if (++j < i) COMlist += ",  ";
+        }
+        COMx = showInputDialog("Which COM port is correct? :\n"+COMlist);
+        if (COMx == null) exit();
+        if (COMx.isEmpty()) exit();
+        i = int(COMx.toLowerCase().charAt(0) - '0');
+        println(i);
+      }
+      String portName = Serial.list()[i];
+      println(portName);
+      //myPort = new Serial(this, portName, 19200); // change baud rate to your liking
+      //myPort.bufferUntil('\n'); // buffer until CR/LF appears, but not required..
+    } else {
+      showMessageDialog(frame, "Device is not connected to the PC");
+      exit();
+    }
+  }
+  catch (Exception e)
+  { //Print the type of error
+    showMessageDialog(frame, "COM port is not available (may\nbe in use by another program)");
+    println("Error:", e);
+    exit();
+  }
   size(320, 200);
   background(#E6E6E6);
   fill(#000000);
-  textAlign(CENTER, CENTER);
-  text("Choose the serial port from the list \n and then click anywhere to continue", width/2, height/2); // display text to user
-  int port_list_length = Serial.list().length;
+  //textAlign(CENTER, CENTER);
+  //text("Choose the serial port from the list \n and then click anywhere to continue", width/2, height/2); // display text to user
+  //int port_list_length = Serial.list().length;
 
-  if (port_list_length==0) {
-    println("There are no serial available.");
-    exit();
-  } else {
-    for (int i=0; i< port_list_length; i++)
-    {
-      guiChoice.add(Serial.list()[i]);  //Add each serial port found to the selection
-    }
+  //if (port_list_length==0) {
+  //  println("There are no serial available.");
+  //  exit();
+  //} else {
+  //  for (int i=0; i< port_list_length; i++)
+  //  {
+  //    //guiChoice.add(Serial.list()[i]);  //Add each serial port found to the selection
+  //  }
 
-    add(guiChoice); //Place the Choice selection box on the display area.
-    frame.setResizable(true);
-  }
+  //  add(guiChoice); //Place the Choice selection box on the display area.
+  surface.setResizable(true);
+
   low_zlimit = -1000.0;
   easing = 0.01;
   positionZ = 100.0;
 }
 
 void draw() {
-  if (selected_port == true) { 
-    if (first_run == false) {
 
-      frame.setSize(2* int(r1+r2), int(r1+r2+100));
-      x = width/2;
+  if (first_run == false) {
+
+    surface.setSize(2* int(r1+r2), int(r1+r2+100));
+    x = width/2;
+    y = height;
+
+    first_run = true;
+  } else {
+
+    positionX = -(width/2 - last_mouseX);
+    positionY = height - last_mouseY;
+
+    //Forward kinematics
+    //--------------------------------------------
+    forward_kinematics();
+    //Inverse kinematics
+    //--------------------------------------------
+    inverse_kinematics();
+
+
+    //rounding
+    //--------------------------------------------
+    rtheta[0] = round(theta[0]);
+    rtheta[1] = round(theta[1]);
+    rtheta[2] = rtheta[1] + round(theta[2]);
+    rtheta[3] = round(theta[3]);
+    rtheta[4] = round(theta[4]);
+
+    rpositionX = round(positionX);
+    rpositionY = round(positionY);
+    rpositionZ = round(positionZ);
+
+
+
+    //x, y position
+    //--------------------------------------------
+    targetX= mouseX;
+    targetY= mouseY;
+
+    x += (targetX - x) * easing;
+    if (x <= left_xlimit + (r1+r2) ) {
+      x = left_xlimit + (r1+r2);
       y = height;
+    }
+    if (x >= right_xlimit + (r1+r2) ) {
+      x = right_xlimit + (r1+r2);
+      y = height;
+    }
 
-      first_run = true;
-    } else {
+    y += (targetY - y) * easing;
 
-      positionX = -(width/2 - last_mouseX);
-      positionY = height - last_mouseY;
+    if (height- y <= low_ylimit) y = height- low_ylimit;
+    if (height- y <= low_ylimit_2) y = height- low_ylimit_2;
+    if (height- y >= up_ylimit_2) y = height- up_ylimit_2;
 
-      //Forward kinematics
-      //--------------------------------------------
-      forward_kinematics();
-      //Inverse kinematics
-      //--------------------------------------------
-      inverse_kinematics();
+    background(#FFFFFF);    
+    fill(#646464);
+    ellipse(width/2, height, max_rad * 2, max_rad* 2);
+    if (y_rad >0) {
+      fill(#E6E6E6);
+      ellipse(width/2, height, y_rad * 2, y_rad*2);
+    }
+    if (min_rad >0) {
+      fill(#FFFFFF);
+      ellipse(width/2, height, min_rad* 2, min_rad * 2);
+    }
 
+    //Drawing
+    //--------------------------------------------
+    drawing();
 
-      //rounding
-      //--------------------------------------------
-      rtheta[0] = round(theta[0]);
-      rtheta[1] = round(theta[1]);
-      rtheta[2] = rtheta[1] + round(theta[2]);
-      rtheta[3] = round(theta[3]);
-      rtheta[4] = round(theta[4]);
-
-      rpositionX = round(positionX);
-      rpositionY = round(positionY);
-      rpositionZ = round(positionZ);
-
-
-
-      //x, y position
-      //--------------------------------------------
-      targetX= mouseX;
-      targetY= mouseY;
-
-      x += (targetX - x) * easing;
-      if (x <= left_xlimit + (r1+r2) ) {
-        x = left_xlimit + (r1+r2);
-        y = height;
-      }
-      if (x >= right_xlimit + (r1+r2) ) {
-        x = right_xlimit + (r1+r2);
-        y = height;
-      }
-
-      y += (targetY - y) * easing;
-
-      if (height- y <= low_ylimit) y = height- low_ylimit;
-      if (height- y <= low_ylimit_2) y = height- low_ylimit_2;
-      if (height- y >= up_ylimit_2) y = height- up_ylimit_2;
-
-      background(#FFFFFF);    
-      fill(#646464);
-      ellipse(width/2, height, max_rad * 2, max_rad* 2);
-      if (y_rad >0) {
-        fill(#E6E6E6);
-        ellipse(width/2, height, y_rad * 2, y_rad*2);
-      }
-      if (min_rad >0) {
-        fill(#FFFFFF);
-        ellipse(width/2, height, min_rad* 2, min_rad * 2);
-      }
-
-      //Drawing
-      //--------------------------------------------
-      drawing();
-
-      //Send data to Arduino
-      //--------------------------------------------
-      for (int i = 0; i <=5; i++) {
-         if (setup_theta[i][3] == 0)
+    //Send data to Arduino
+    //--------------------------------------------
+    for (int i = 0; i <=5; i++) {
+      if (setup_theta[i][3] == 0)
         out[i] = byte(constrain(rtheta[i] + setup_theta[i][1]-90.0, setup_theta[i][0], setup_theta[i][2]));
-        else if (setup_theta[i][3] == 1)
+      else if (setup_theta[i][3] == 1)
         out[i] = byte(constrain(180.0-(rtheta[i] + setup_theta[i][1]-90.0), setup_theta[i][0], setup_theta[i][2]));
-      }
     }
   }
 }
@@ -272,12 +304,12 @@ void drawing() {
   fill(#000000);
   text(s1, 10, 10);
   text(s2, 10, 50);
-  
+
   fill(#939191);
   textSize(12);
   textAlign(RIGHT, BOTTOM);
   text("using the mouse wheel to adjust Z /n Press 'a' and 's' to adjust theta_3", width, height);
-  
+
   if (!trigger_servo) {
     fill(#AAAAAA, 200);
     noStroke();
@@ -303,14 +335,8 @@ void keyPressed() {
 }
 
 void mouseClicked() {
-  if (selected_port == false) {
-    println(guiChoice.getSelectedItem()); // print selection
-    myPort= new Serial(this, guiChoice.getSelectedItem(), 115200);
-    remove(guiChoice); // remove drop-down list, otherwise it appears on top of the video feed
-    selected_port= true;
-  } else {
-    is_clamp = !is_clamp;
-  }
+
+  is_clamp = !is_clamp;
 }
 
 void serialEvent(Serial myPort) {
@@ -331,8 +357,7 @@ void serialEvent(Serial myPort) {
       if (trigger_servo)
         myPort.write(out[i]);
       else 
-        myPort.write(250+i);
+      myPort.write(250+i);
     }
   }
 }
-
