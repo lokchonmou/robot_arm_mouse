@@ -160,13 +160,19 @@ void draw() {
       //Send data to Arduino
       //--------------------------------------------
       for (int i = 0; i <=5; i++) {
+        if (i != 2){
          if (setup_theta[i][3] == 0)
-        out[i] = byte(constrain(rtheta[i] + setup_theta[i][1]-90.0, setup_theta[i][0], setup_theta[i][2]));
+          out[i] = byte(constrain(rtheta[i] + setup_theta[i][1]-90.0, setup_theta[i][0], setup_theta[i][2]));
         else if (setup_theta[i][3] == 1)
-        out[i] = byte(constrain(180.0-(rtheta[i] + setup_theta[i][1]-90.0), setup_theta[i][0], setup_theta[i][2]));
+          out[i] = byte(constrain(180.0-(rtheta[i] + setup_theta[i][1]-90.0), setup_theta[i][0], setup_theta[i][2]));
+      }
+      else {
+        if (setup_theta[1][3] == 0 && setup_theta[2][3] == 1)
+          out[i] = byte(constrain(90.0-(rtheta[i] + setup_theta[i][1]-90.0), setup_theta[i][0], setup_theta[i][2]));
       }
     }
   }
+}
 }
 
 void forward_kinematics() {
@@ -335,4 +341,3 @@ void serialEvent(Serial myPort) {
     }
   }
 }
-
