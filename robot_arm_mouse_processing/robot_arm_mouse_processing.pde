@@ -30,15 +30,15 @@ float r2 = 160.0;
 // servo angle [min     center     max    direction]
 float[][]  setup_theta = {
   {
-    0, 104, 180, 1      //shoulder_yaw
+    9, 91, 177, 0      //shoulder_yaw
   }
   , 
   {
-    40, 78, 160, 1      //shoulder_pitch
+    8, 78, 120, 0      //shoulder_pitch
   }
   , 
   {
-    23, 142, 146, 0      //Elbow 手肘
+    0, 0, 89, 1      //Elbow 手肘
   }
   , 
   {
@@ -110,7 +110,7 @@ void draw() {
       //--------------------------------------------
       rtheta[0] = round(theta[0]);
       rtheta[1] = round(theta[1]);
-      rtheta[2] = rtheta[1] + round(theta[2]);
+      rtheta[2] = rtheta[1] + round(theta[2])+90;
       rtheta[3] = round(theta[3]);
       rtheta[4] = round(theta[4]);
 
