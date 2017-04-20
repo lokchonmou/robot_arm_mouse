@@ -1,9 +1,5 @@
 #include <Servo.h>
 
-#define E1 5
-#define M1 4
-#define E2 6
-#define M2 7
 
 byte currentValue = 0;
 byte values[6];
@@ -11,9 +7,10 @@ Servo servo[6];
 
 void setup() {
   Serial.begin(115200);
-  pinMode(M1, OUTPUT);
-  pinMode(M2, OUTPUT);
-  establishContact();
+   while (Serial.available() <= 0) {
+    Serial.println('a');   // send an initial string
+    delay(300);
+  }
 }
 
 void loop() {
@@ -25,18 +22,8 @@ void loop() {
       for (byte i = 0; i <= 5; i++) {
         if (values[i] < 250 )
         {
-          if (servo[i].attached() == LOW)  servo[i].attach(13 - i);
+          if (servo[i].attached() == LOW)  servo[i].attach(8 + i);
           servo[i].write(values[i]);
-          if (i == 4)  {
-            if (values[i] > 90 && values[i] <= 180) {
-              digitalWrite(M1, HIGH);
-              analogWrite(E1, values[i] - 90);
-            }
-            else if (values[i] >= 0 && values[i] <= 90) {
-              digitalWrite(M1, LOW);
-              analogWrite(E1, 90 - values[i]);
-            }
-          }
         }
         else {
           if (servo[i].attached() == HIGH)  servo[i].detach();
@@ -46,13 +33,6 @@ void loop() {
       }
       Serial.println();
     }
-
   }
 }
 
-void establishContact() {
-  while (Serial.available() <= 0) {
-    Serial.println();   // send an initial string
-    delay(300);
-  }
-}
