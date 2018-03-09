@@ -1,5 +1,5 @@
 # robot_arm_mouse
-control 4 DOF robot arm using mouse, thought Processing
+control 3 DOF robot arm using mouse, thought Processing
 <p>Also read https://sites.google.com/site/arduinorobotprocessing/home/arduino/2-arduino-x-robot/2-7-robot-arms to learn the theory and the connection 
 <p><img width = 300px src="https://lh5.googleusercontent.com/-iVy9mOLFt-U/VWfRbBA9vFI/AAAAAAAAFsc/1umu8NvZ1Gg/w1582-h1224-no/dh%2Bgraph.jpg">
 
@@ -12,3 +12,6 @@ Open the Processing code, find the above array
 <p>
 the perimeter are min. angle, standard angle(90), max. angle and direction respectively.
 <p> for the direction, 0 means your servo direction is same as the dh graph, 1 means it is oppositive to the direction shown in the dh graph
+  
+###UPDATE 2018-03-10     ROBOT from 4 DOF change to 3 DOF, a uArm link robot
+                         A complete GUI is intergated with the servo testing function
